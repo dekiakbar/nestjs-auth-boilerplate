@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+    db:
+        container_name: nestjs-auth-db
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: auth
+        ports:
+            - "5432:5432"
+        networks:
+            nestjs-auth:
+                ipv4_address: 172.0.0.2
+    pgadmin:
+        container_name: nestjs-auth-pgadmin
+        image: dpage/pgadmin4
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@admin.com
+            PGADMIN_DEFAULT_PASSWORD: root
+        ports:
+            - "5050:80"
+        depends_on:
+            - db
+        networks:
+            nestjs-auth:
+                ipv4_address: 172.0.0.3
+networks:
+    nestjs-auth:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.0.0.0/29
+                # gateway: 172.0.0.1
