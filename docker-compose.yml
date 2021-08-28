@@ -1,5 +1,18 @@
 version: '3.8'
 services:
+    web:
+      build: .
+      command: npm run start:dev
+      volumes:
+        - .:/usr/app/
+        - /usr/app/node_modules
+      ports:
+        - "3000:3000"
+      depends_on:
+        - db
+      networks:
+          network:
+              ipv4_address: 172.0.0.4
     db:
         container_name: nestjs-auth-db
         image: postgres
@@ -11,7 +24,7 @@ services:
         ports:
             - "5432:5432"
         networks:
-            nestjs-auth:
+            network:
                 ipv4_address: 172.0.0.2
     pgadmin:
         container_name: nestjs-auth-pgadmin
@@ -25,10 +38,10 @@ services:
         depends_on:
             - db
         networks:
-            nestjs-auth:
+            network:
                 ipv4_address: 172.0.0.3
 networks:
-    nestjs-auth:
+    network:
         driver: bridge
         ipam:
             config:
