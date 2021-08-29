@@ -1,16 +1,17 @@
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
-import { CreateUserDto } from "../dto/create-user.dto";
+import { SignUpDto } from "../dto/sign-up.dto";
 import { User } from "../entities/user.entity";
 import * as bcrypt from 'bcrypt';
+import { SignInDto } from "../dto/sign-in.dto";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
 
   async signUp(
-    createUserDto: CreateUserDto
+    signUpDto: SignUpDto
   ): Promise<void>{
-    const { username, email, password } = createUserDto;
+    const { username, email, password } = signUpDto;
 
     const user = new User();
     user.username = username;
@@ -26,6 +27,24 @@ export class UserRepository extends Repository<User> {
       }else{
         throw new InternalServerErrorException();
       }
+    }
+  }
+
+  async validatePassword(
+    signInDto: SignInDto
+  ): Promise<string>{
+    const { username, email, password } = signInDto;
+    const user = await this.findOne({
+      where: [
+        { username: username },
+        { email: email }
+      ]
+    });
+    
+    if(user && await user.validateHash(password)){
+      return user.username;
+    }else{
+      return null;
     }
   }
 
