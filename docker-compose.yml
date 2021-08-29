@@ -5,7 +5,6 @@ services:
       command: npm run start:dev
       volumes:
         - .:/usr/app/
-        - /usr/app/node_modules
       ports:
         - "3000:3000"
       depends_on:
@@ -46,4 +45,3 @@ networks:
         ipam:
             config:
                 - subnet: 172.0.0.0/29
-                # gateway: 172.0.0.1
