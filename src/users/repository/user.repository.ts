@@ -4,6 +4,7 @@ import { SignUpDto } from "../dto/sign-up.dto";
 import { User } from "../entities/user.entity";
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from "../dto/sign-in.dto";
+import { UserStatus } from "../enum/user-status.enum";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -16,6 +17,7 @@ export class UserRepository extends Repository<User> {
     const user = new User();
     user.username = username;
     user.email = email;
+    user.status = UserStatus.UNCONFIRMED;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
 
@@ -32,7 +34,7 @@ export class UserRepository extends Repository<User> {
 
   async validatePassword(
     signInDto: SignInDto
-  ): Promise<string>{
+  ): Promise<User>{
     const { username, email, password } = signInDto;
     const user = await this.findOne({
       where: [
@@ -42,7 +44,7 @@ export class UserRepository extends Repository<User> {
     });
     
     if(user && await user.validateHash(password)){
-      return user.username;
+      return user;
     }else{
       return null;
     }

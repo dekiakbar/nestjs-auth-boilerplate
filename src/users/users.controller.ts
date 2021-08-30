@@ -8,7 +8,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('signup')
-  signUp(@Body(ValidationPipe) signUpDto: SignUpDto) {
+  signUp(@Body(ValidationPipe) signUpDto: SignUpDto): Promise<void> {
     return this.usersService.signUp(signUpDto);
   }
 

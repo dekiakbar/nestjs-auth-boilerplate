@@ -1,5 +1,6 @@
 import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { UserStatus } from "../enum/user-status.enum";
 
 @Entity()
 export class User extends BaseEntity{
@@ -13,6 +14,9 @@ export class User extends BaseEntity{
   @Column()
   @Index({ unique: true })
   email: string;
+
+  @Column()
+  status: UserStatus;
 
   @Column()
   password: string;
