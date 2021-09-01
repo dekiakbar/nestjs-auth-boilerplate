@@ -8,7 +8,7 @@ import { EmailModule } from './email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env.local',
+      envFilePath: ['.env.local', '.env.example'],
       isGlobal: true
     }),
     UsersModule,
