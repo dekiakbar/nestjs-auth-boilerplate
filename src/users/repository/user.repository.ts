@@ -5,10 +5,12 @@ import { User } from "../entities/user.entity";
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from "../dto/sign-in.dto";
 import { UserStatus } from "../enum/user-status.enum";
+import * as crypto from 'crypto';
+import { Token } from "../entities/token.entity";
+import { TokenType } from "../enum/token-type.enum";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-
   async signUp(
     signUpDto: SignUpDto
   ): Promise<User>{
@@ -21,8 +23,17 @@ export class UserRepository extends Repository<User> {
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
 
+    const token = new Token();
+    token.type = TokenType.EMAIL_VERIICATION;
+    token.token = crypto.randomBytes(32).toString('hex');
+    // token.created_at = new Date();
+
     try{
-      return await user.save();
+      const userData = await user.save();
+      token.user = userData;
+      token.save();
+
+      return userData;
     }catch(error){
       if( error.code === '23505'){
         throw new ConflictException('Username or email already exist');

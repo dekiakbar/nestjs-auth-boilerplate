@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { SendEmailDto } from './dto/send-email.dto';
@@ -42,7 +42,7 @@ export class EmailService {
       
       return info;
     }catch(error){
-      console.log(error);
+      throw new InternalServerErrorException("Error when sending email");
     }
 
   }

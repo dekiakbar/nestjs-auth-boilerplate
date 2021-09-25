@@ -1,6 +1,7 @@
-import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { UserStatus } from "../enum/user-status.enum";
+import { Token } from "./token.entity";
 
 @Entity()
 export class User extends BaseEntity{
@@ -23,6 +24,9 @@ export class User extends BaseEntity{
 
   @Column()
   salt: string;
+
+  @OneToMany(type => Token, token => token.user, { eager: true })
+  tokens: Token[];
 
   async validateHash(password: string): Promise<boolean>{
     const hash = await bcrypt.hash(password, this.salt);
