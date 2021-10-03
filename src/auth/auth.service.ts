@@ -1,12 +1,14 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SendEmailDto } from 'src/email/dto/send-email.dto';
 import { EmailService } from 'src/email/email.service';
+import { TimezoneService } from 'src/timezone/timezone.service';
 import { SignInDto } from 'src/users/dto/sign-in.dto';
 import { SignUpDto } from 'src/users/dto/sign-up.dto';
 import { VerifyUserDto } from 'src/users/dto/verify-user.dto';
+import { TokenType } from 'src/users/enum/token-type.enum';
 import { UserStatus } from 'src/users/enum/user-status.enum';
 import { TokenRepository } from 'src/users/repository/token.repository';
 import { UserRepository } from 'src/users/repository/user.repository';
@@ -21,7 +23,8 @@ export class AuthService {
     private tokenRepository: TokenRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private timezoneService: TimezoneService
   ){}
   
   async signUp(signUpDto: SignUpDto): Promise<string>{
@@ -58,7 +61,29 @@ export class AuthService {
   async verifyUser(
     verifyUserDto: VerifyUserDto
   ){
-    const user = await this.tokenRepository.verifyUser(verifyUserDto);
+    const token = await this.tokenRepository.findOne({
+      relations: ['user'],
+      where: [
+        {
+          token : verifyUserDto,
+          type: TokenType.EMAIL_VERIICATION
+        }
+      ]
+    });
+
+    if(!token){
+      throw new NotFoundException("Token is missmatch or invalid");
+    }
+    
+    if(token.user.status === UserStatus.CONFIRMED){
+      throw new BadRequestException("User already verified");
+    }
+
+    if( await this.timezoneService.isExpired(token.created_at) ){
+      throw new BadRequestException("Token is Expired");
+    }
+
+    const user = await this.tokenRepository.setUserAsVerified(token);
     const payload: JwtPayload = { username: user.username };
     const accessToken = await this.jwtService.sign(payload);
     return { accessToken };

@@ -26,7 +26,6 @@ export class UserRepository extends Repository<User> {
     const token = new Token();
     token.type = TokenType.EMAIL_VERIICATION;
     token.token = crypto.randomBytes(32).toString('hex');
-    // token.created_at = new Date();
 
     try{
       const userData = await user.save();

@@ -10,10 +10,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TokenRepository } from 'src/users/repository/token.repository';
 import { EmailModule } from 'src/email/email.module';
+import { TimezoneModule } from 'src/timezone/timezone.module';
 
 @Module({
   imports:[
     forwardRef(() => UsersModule),
+    TimezoneModule,
     EmailModule,
     TypeOrmModule.forFeature([
       UserRepository,

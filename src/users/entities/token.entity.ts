@@ -16,6 +16,6 @@ export class Token extends BaseEntity{
   @ManyToOne(type => User, user => user.tokens, { eager: false })
   user: User;
 
-  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+  @CreateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP(6)" })
   public created_at: Date;
 }

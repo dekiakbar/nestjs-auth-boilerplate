@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './email/email.module';
 import { AuthModule } from './auth/auth.module';
+import { TimezoneModule } from './timezone/timezone.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     EmailModule,
     AuthModule,
+    TimezoneModule,
   ],
   controllers: [],
   providers: [],
